@@ -1,0 +1,68 @@
+---
+title: "DATA 607 - Assignment 1"
+author: "Calvin Wong"
+date: "9/3/2018"
+output: html_document
+---
+
+Calling the libraries I typically work with
+```{r}
+library(datasets)
+library(descr)
+library(ggplot2)
+library(graphics)
+library(grDevices)
+library(knitr)
+library(methods)
+library(rsconnect)
+library(stats)
+library(utils)
+library(dplyr)
+```
+
+Data Set Information:
+
+This data set includes descriptions of hypothetical samples corresponding to 23 species of gilled mushrooms in the Agaricus and Lepiota Family (pp. 500-525). Each species is identified as definitely edible, definitely poisonous, or of unknown edibility and not recommended. This latter class was combined with the poisonous one. The Guide clearly states that there is no simple rule for determining the edibility of a mushroom; no rule like ``leaflets three, let it be'' for Poisonous Oak and Ivy.
+
+
+Source:
+
+Origin: 
+
+Mushroom records drawn from The Audubon Society Field Guide to North American Mushrooms (1981). G. H. Lincoff (Pres.), New York: Alfred A. Knopf 
+
+Donor: 
+
+Jeff Schlimmer (Jeffrey.Schlimmer '@' a.gp.cs.cmu.edu)
+
+
+Loading the data
+```{r}
+theUrl <- "https://archive.ics.uci.edu/ml/machine-learning-databases/mushroom/agaricus-lepiota.data"
+mushrooms <-read.table(file=theUrl, header=FALSE, sep=",")
+names(mushrooms) <- c("class","cap-shape","cap-surface","cap-color","bruises?","odor","gill-attachment","gill-spacing","gill-size","gill-color","stalk-shape","stalk-root","stalk-surface-above-ring","stalk-surface-below-ring","stalk-color-above-ring","stalk-color-below-ring","veil-type","veil-color","ring-number","ring-type","spore-print-color","population","habitat")
+head(mushrooms)
+```
+
+Selecting columns I want to work with. I also randomized 2000 out of the 8124 entries to work with. I named my new dataset newMushrooms.
+```{r}
+mushrooms <- select(mushrooms, "class", "cap-shape", "odor","stalk-shape","population","habitat")
+head(mushrooms)
+newMushrooms <- sample_n(mushrooms, 2000)
+str(newMushrooms)
+```
+Here I am referencing levels to attributes based on the data set description
+```{r}
+levels(newMushrooms$class) <- c("edible","poisonous")
+levels(newMushrooms$'cap-shape') <- c("bell","conical","flat","knobbed","sunken","convex")
+levels(newMushrooms$odor) <- c("almond","anise","creosote","fishy","foul","musty","none","pungent","spicy")
+levels(newMushrooms$'stalk-shape') <- c("enlarging","tapering")
+levels(newMushrooms$population) <- c("abundant","clustered","numerous","scattered","several","solitary")
+levels(newMushrooms$habitat) <- c("grasses","leaves","meadows","paths","urban","waste","woods")
+head(newMushrooms)
+```
+
+```{r}
+summary(newMushrooms)
+```
+
