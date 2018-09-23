@@ -1,0 +1,61 @@
+---
+title: "Project 1"
+author: "Calvin Wong"
+date: "9/15/2018"
+output: html_document
+---
+
+In this project, you’re given a text file with chess tournament results where the information has some structure. Your job is to create an R Markdown file that generates a .CSV file. 
+
+Required: Player’s Name, Player’s State, Total Number of Points, Player’s Pre-Rating, and Average Pre Chess Rating of Opponents
+
+Let's load the necessary packages to perform the assigned tasks.
+```{r}
+library(stringr)
+library(DT)
+library(data.table)
+
+tournamentinfo <- readLines("https://raw.githubusercontent.com/cwong79/DATA607/Project-1/tournamentinfo.txt")
+head(tournamentinfo)
+```
+From observation of the data table, we see that the text file is formatted in a way where the information is segmented into 2 lines. The first line contains player ID, name and points with win/loss information. The second line contains state and rating. I will first format the row data into 2 different sets, 1 set for each row. From there, I will extract the necessary information to a vector. Finally, I will combined these vectors to form a formatted database.
+
+Let's begin by pulling all the data we need into a workable database.
+
+```{r}
+line1 <- seq(5, 196, 3) # start on applicable row to pull player and name
+line2 <- seq(6, 196, 3) # start on applicable row to pull state and points
+player <- as.integer(str_extract(tournamentinfo[line1], "\\d+")) # line 1, pull out player id
+name <- str_replace_all(str_extract(tournamentinfo[line1],"([|]).+?\\1"),"[|]","") # line 1, pull out player name
+points <- str_extract(tournamentinfo[line1], "\\d.\\d") # line 1, pull out points
+state <- str_extract(tournamentinfo[line2], "[A-Z]{2}" ) # line 2, pull out state
+rating <- as.integer(str_replace_all(str_extract(tournamentinfo[line2], "R: \\s?\\d{3,4}"), "R:\\s", "")) # line 2, player rating 
+newtournamentinfo <- data.frame(player, name, state, points, rating) # combine vectors to form the required database
+head(newtournamentinfo)
+```
+
+Now to calculate average opponent rating. I have the opponent information available from line 1, I will need to extract opponents rankings based on player number and store the values into an opponent variable. I then created a loop to calculate average rankings and insert the value into a vector named avgopponent.
+
+```{r}
+opponents <- str_extract_all(str_extract_all(tournamentinfo[line1], "\\d+\\|"), "\\d+")
+
+avgopponent <- length(line1)
+for (i in 1:length(line1)) 
+{ 
+  avgopponent[i] <- round(mean(rating[as.numeric(unlist(opponents[player[i]]))]), digits = 0)
+}
+avgopponent
+```
+Finally, lets add the avgopponent variable to our completed database. I named this database newtournamentinfo1.
+
+```{r}
+newtournamentinfo1 <- data.frame(player, name, state, points, rating, avgopponent)
+head(newtournamentinfo1)
+```
+
+With the completed table, I wrote to a csv file and called it newtournamentinfo as per assignment instructions.
+
+```{r}
+write.csv(newtournamentinfo1, file = "newtournamentinfo.csv")
+```
+
