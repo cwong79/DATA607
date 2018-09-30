@@ -1,0 +1,64 @@
+---
+title: "Week 5 - Assignment"
+author: "Calvin Wong"
+date: "9/29/2018"
+output: html_document
+---
+
+The chart above describes arrival delays for two airlines across five destinations. Your task is to:
+(1) Create a .CSV file (or optionally, a MySQL database!) that includes all of the information above. You’re encouraged to use a “wide” structure similar to how the information appears above, so that you can practice tidying and transformations as described below.
+
+https://raw.githubusercontent.com/cwong79/DATA607/master/flights.csv
+
+(2) Read the information from your .CSV file into R, and use tidyr and dplyr as needed to tidy and transform your data.
+
+I used mysql to create the appropriate csv file with untidy information. My goal was to to tidy the data and have it into two structures so I can begin my analysis.
+```{r}
+library(tidyverse)
+library(knitr)
+library(gridExtra)
+
+url <- "https://raw.githubusercontent.com/cwong79/DATA607/master/flights.csv"
+flight <- read_csv(url)
+
+## remove NULL row based on rule
+newflight <- select(flight, -1) %>% filter(Schedule != "NULL" )
+
+## loop replacement for NULL values. If NULL value is found, the loop will assign a value from the entry above.
+for(i in 2:nrow(newflight)) {
+  if(newflight$Airlines[i] == "NULL"){
+    newflight$Airlines[i] <- newflight$Airlines[i-1]
+  }
+}
+
+## convert char values into workable integers
+newflight[, c(3:7)] <- sapply(newflight[, c(3:7)], as.integer)
+
+## apply tidyverse functions
+tidyflight <- newflight %>% gather(City, Count, 3:7) %>% spread(Schedule, Count) %>% mutate(`total flight`=delayed+`on time`)
+tidyflight
+
+## created another dataset to show delayed ratios
+flightbyairlines <- tidyflight %>% group_by(Airlines) %>% summarise(delayed=sum(delayed), `on time`=sum(`on time`), `total flight`=delayed+`on time`, `delayed ratio`=delayed/`total flight`) 
+flightbyairlines
+```
+
+(3) Perform analysis to compare the arrival delays for the two airlines.
+
+Lets look at total flights graphically to get an idea how flights from cities are distributed
+```{r}
+ggplot(tidyflight) + geom_bar(aes(x=Airlines, y=`total flight`, fill=Airlines), stat = "identity") + facet_wrap(~ City, nrow = 1) + theme(axis.text.x=element_blank(),axis.ticks.x=element_blank())
+```
+
+Based on the cumulative flight data for both airlines, we can see Alaska flying approximately less than half of Amwest but has a higher amount of delayed flights.
+```{r}
+p1 <- ggplot(flightbyairlines) + geom_bar(aes(x=Airlines, y=`total flight`, fill=Airlines), stat = "identity")
+p2 <- ggplot(flightbyairlines) + geom_bar(aes(x=Airlines, y=`delayed ratio`, fill=Airlines), stat = "identity")
+grid.arrange(p1, p2, nrow=1)
+```
+
+We can conclude that Amwest is more effective at managing delayed flights.
+
+(4) Your code should be in an R Markdown file, posted to rpubs.com, and should include narrative descriptions of your data cleanup work, analysis, and conclusions. Please include in your homework submission:
+ The URL to the .Rmd file in your GitHub repository. and
+ The URL for your rpubs.com web page.
