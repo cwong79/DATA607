@@ -1,0 +1,79 @@
+---
+title: "Project 2"
+author: "Calvin Wong"
+date: "10/5/2018"
+output: html_document
+---
+
+```{r}
+
+library(readxl)
+library(tidyr)
+library(stringr)
+library(dplyr)
+
+path <- "http://s3.amazonaws.com/assets.datacamp.com/production/course_1294/datasets/attendance.xls"
+download.file(path, destfile = "attendance.xls", mode="wb")
+attendance <- read_excel('attendance.xls', sheet = 1, col_names = TRUE, skip =1) 
+attendance ##lets observe the data
+
+```
+![](http://s3.amazonaws.com/assets.datacamp.com/production/course_1294/datasets/attendance_screenshot.png)
+We can see that there are columns we should remove. I have identified them as rows 3, 10, 16, 22, 28, 34, 40, 46, 52, 58, 65-68. Row 1 in the excel was actually identified as a variable name in the first column. This shifted the position of all the necessary rows which needed to be remove. It is important to review the imported information to ensure correct tidy steps are taken.
+
+```{r}
+## remove rows
+remove <- c(1, 2, 3, 9, 15, 21, 27, 33, 39, 45, 51, 57, 64:67)
+r_attendance <- attendance[-remove, ]
+```
+
+```{r}
+## remove columns
+remove <- c(3, 5, 7, 9, 11, 13, 15, 17)
+c_attendance <- r_attendance[ ,-remove]
+head(c_attendance)
+
+## lets focus on columns 1 - 5 as the rest of the columns are actually data subsets
+f_attendance <- c_attendance[, 1:5]
+cnames <- c("state", "avg_attend_pct", "avg_hr_per_day", "avg_day_per_yr", "avg_hr_per_yr") ##rename columns
+colnames(f_attendance) <- cnames
+
+f_attendance$state <- str_replace_all(f_attendance$state, "\\.","") ## remove all periods after state name
+f_attendance$state <- trimws(f_attendance$state) ## remove blank space
+head(f_attendance)
+```
+
+Now let us change the column values for all the averages into an numerical. I will also round it by two decimal points.
+
+```{r}
+cols <- c(2:5)  ##the columns I want to change
+f_attendance[, cols] <- sapply(f_attendance[,cols], as.numeric) ## apply numeric function to columns 2 to 5
+tidy_attendance <- f_attendance %>% mutate_at(2:5, round, 2) ## round those columns by two decimals points
+```
+
+Region 1: Northeast
+Connecticut, Maine, Massachusetts, New Hampshire, Rhode Island, Vermont, New Jersey, New York, and Pennsylvania
+
+Region 2: Midwest 
+Illinois, Indiana, Michigan, Ohio, Wisconsin, Iowa, Kansas, Minnesota, Missouri, Nebraska, North Dakota, and South Dakota
+
+Region 3: South
+Delaware, Florida, Georgia, Maryland, North Carolina, South Carolina, Virginia, District of Columbia, West Virginia, Alabama, Kentucky, Mississippi, Tennessee, Arkansas, Louisiana, Oklahoma, and Texas
+
+Region 4: West
+Arizona, Colorado, Idaho, Montana, Nevada, New Mexico, Utah, Wyoming, Alaska, California, Hawaii, Oregon, and Washington
+
+Let's subset data for southern states and only pull avg_attend_pct and avg_hr_per_day
+
+```{r}
+south <- c('Delaware', 'Florida', 'Georgia', 'Maryland', 'North Carolina', 'South Carolina', 'Virginia', 'District of Columbia', 'West Virginia', 'Alabama', 'Kentucky', 'Mississippi', 'Tennessee', 'Arkansas', 'Louisiana', 'Oklahoma', 'Texas')
+north <- c('Connecticut', 'Maine', 'Massachusetts', 'New Hampshire', 'Rhode Island', 'Vermont', 'New Jersey', 'New York', 'Pennsylvania')
+tidy_attendance %>% select(state, avg_attend_pct, avg_hr_per_day) %>% filter(state %in% south)
+```
+
+Here I wanted to see how northern states ranked in terms of avg_day_per_yr
+
+```{r}
+tidy_attendance %>% arrange(avg_day_per_yr) %>% filter(state %in% north)
+```
+
