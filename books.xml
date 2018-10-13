@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<books>
+
+    <books id="1">
+        <title>A Brief History of Time</title>
+        <author>Stephen Hawking</author>
+        <year>2011</year>
+        <genre>Science</genre>
+        <rating>4.5</rating>
+    </books>
+
+    <books id="2">
+        <title>Kitchen Confidential</title>
+        <author>Anthony Bourdain</author>
+        <year>2008</year>
+        <genre>Gastronomy</genre>
+        <rating>4.6</rating>
+    </books>
+
+    <books id="3">
+        <title>The Silent Oligarch</title>
+        <author>Christopher Jones</author>
+        <year>2012</year>
+        <genre>Fiction</genre>
+        <rating>3.5</rating>
+    </books>
+
+</books>    
