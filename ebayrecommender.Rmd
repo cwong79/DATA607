@@ -1,0 +1,42 @@
+---
+title: "Recommender Systems"
+author: "Calvin Wong"
+date: "11/7/2018"
+output: html_document
+---
+
+eBay Inc. is an American multinational e-commerce corporation based in California that facilitates consumer-to-consumer and business-to-consumer sales through its website. Some of the unique propositions of eBay as shopping website includes: -
+
+1)	Worldwide presence
+eBay has 23 international sites and presence in over 100 countries worldwide. It seems the limiting factor is only where a seller can ship goods to.
+2)	Auction format
+3 methods of listing goods are available. This includes fixed price (traditional e-commerce), best offer and auction-style (what eBay is known for).
+3)	Used items
+eBay is known as a secondhand marketplace in its infancy. In this regard, eBay is still the powerhouse when it comes to used goods because of its breadth and depth of products. 
+
+Scenario Design
+
+1)	Who are your target users?
+The company says it has 800 million listings and that 79% of Marketplaces GMV (Gross Merchandise Volume) comes from fixed-price listings. As of now, it seems eBay business focus is towards the average consumer and competes directly with other online retailers. This is a shift from the consumers in the used goods market.
+
+2)	What are their key goals?
+eBay sees that core target consumer desires an online experience which online retailers provide. Their key goal is to mimic successful online retail user experiences. A secondary goal, more in-line with business functionality, is to provide logistical advances other online retailers provide. These would include, quick-ship methods and standardize packaging.
+
+3)	How can you help them accomplish those goals?
+One of their weaknesses is in recommender systems. It is a fairly new adoption and much behind when compared to other online retailers such as Amazon and Walmart.
+
+Unlike other online retailers, eBay listings are driven by users rather than product manufacturers. This creates issues for traditional recommender system applications. As a semi-unstructured market place, eBay’s recommendation systems face challenges that cannot be resolved by standard collaborative filtering techniques. I suspect this is the reason why eBay’s recommendation system lean towards professional resellers rather than the casual lister. 
+
+```{r echo=FALSE, out.width='100%'}
+knitr::include_graphics('/Users/cwong79/Desktop/eBay2.png')
+```
+
+Here is a sample recommender of an Iphone XS listing on eBay.
+
+```{r echo=FALSE, out.width='100%'}
+knitr::include_graphics('/Users/cwong79/Desktop/eBay1.png')
+```
+
+Here is a sample of like Iphone XS products listed on eBay.
+
+In both instances, recommender systems skew towards professional resellers. I saw many instances of this with other products. Also, if I were looking at the latest and greatest products, I wish I would see the recommender provided more pertinent content. I would rather see more Iphone XS models rather than older Iphones. I suspect semi-unstructured data is the cause of this disconnect.
